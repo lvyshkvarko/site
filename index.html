@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Общественная организация</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #F5F7FA 0%, #E6ECEF 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #333333;
+    }
+    .dark body {
+      background: linear-gradient(135deg, #1B263B 0%, #0B1320 100%);
+      color: #D1D5DB;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark .glass {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+    .btn {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: #2E4A7D;
+      color: white;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(46, 74, 125, 0.4);
+    }
+    .btn:active {
+      transform: translateY(0);
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn:hover::after {
+      left: 100%;
+    }
+    #burger-menu {
+      transform: translateX(100%);
+      transition: transform 0.5s ease;
+      z-index: 30;
+    }
+    #burger-menu.open {
+      transform: translateX(0);
+    }
+    #burger-toggle {
+      color: #2E4A7D;
+    }
+    .dark #burger-toggle {
+      color: white;
+    }
+    #close-menu {
+      color: #2E4A7D;
+    }
+    .dark #close-menu {
+      color: white;
+    }
+    .notification-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 40;
+    }
+    .notification, .like-widget {
+      background: #2E4A7D;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      box-shadow: 0 0 15px rgba(46, 74, 125, 0.5);
+      margin-top: 10px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      max-width: 300px;
+    }
+    .notification.show, .like-widget.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .parallax-section {
+      position: relative;
+      transform: translateZ(0);
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .news-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 16px;
+    }
+    .news-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: block;
+    }
+    .preview-image {
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    .news-content {
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .news-content h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+      color: #2E4A7D;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .news-content h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+      color: #2E4A7D;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .news-content p {
+      margin: 0.5rem 0;
+      color: #333333;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .news-content strong {
+      font-weight: 700;
+      color: #2E4A7D;
+    }
+    .news-content em {
+      font-style: italic;
+      color: #6B7280;
+    }
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar button, .toolbar select {
+      background: #2E4A7D;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .toolbar select {
+      width: 160px;
+    }
+    #preview {
+      min-height: 100px;
+      color: #333333;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #preview h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+      color: #2E4A7D;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #preview h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+      color: #2E4A7D;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #preview p {
+      margin: 0.5rem 0;
+      color: #333333;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #preview strong {
+      font-weight: 700;
+      color: #2E4A7D;
+    }
+    #preview em {
+      font-style: italic;
+      color: #6B7280;
+    }
+    .dark .news-content h2, .dark .news-content h3, .dark .news-content strong {
+      color: white;
+    }
+    .dark .news-content p {
+      color: #D1D5DB;
+    }
+    .dark .news-content em {
+      color: #D1D5DB;
+    }
+    .dark #preview h2, .dark #preview h3, .dark #preview strong {
+      color: white;
+    }
+    .dark #preview p, .dark #preview em {
+      color: #D1D5DB;
+    }
+    .dark #preview {
+      color: #D1D5DB;
+    }
+    h1, h2:not(.news-content h2), h3:not(.news-content h3) {
+      color: #2E4A7D;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark h1, .dark h2:not(.news-content h2), .dark h3:not(.news-content h3) {
+      color: white;
+    }
+    input, textarea {
+      color: #333333;
+      border-color: #6B7280;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #6B7280;
+    }
+    .dark input, .dark textarea {
+      color: #D1D5DB;
+      border-color: #6B7280;
+    }
+    .dark input::placeholder, .dark textarea::placeholder {
+      color: #6B7280;
+    }
+    .text-gray-400 {
+      color: #6B7280;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark .text-gray-400 {
+      color: #9CA3AF;
+    }
+    #auth-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    #auth-modal.show {
+      display: flex;
+    }
+    .modal-content {
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      position: relative;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #2E4A7D;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .dark .close-btn {
+      color: white;
+    }
+    .close-btn:hover {
+      color: #4B9EFF;
+    }
+    .dark .close-btn:hover {
+      color: #4B9EFF;
+    }
+    .likes-list {
+      font-size: 0.875rem;
+      color: #6B7280;
+      margin-top: 8px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark .likes-list {
+      color: #9CA3AF;
+    }
+    .file-input-label {
+      display: inline-block;
+      background: #2E4A7D;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .file-input-label:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(46, 74, 125, 0.4);
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .comment-meta {
+      font-size: 0.875rem;
+      color: #6B7280;
+      margin-bottom: 4px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dark .comment-meta {
+      color: #9CA3AF;
+    }
+    .delete-comment-btn {
+      background: #EF4444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.75rem;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+    .delete-comment-btn:hover {
+      background-color: #DC2626;
+    }
+    #user-name {
+      color: #2E4A7D;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark #user-name {
+      color: white;
+    }
+    #notification-bell {
+      color: #2E4A7D;
+      cursor: pointer;
+      position: relative;
+    }
+    .dark #notification-bell {
+      color: white;
+    }
+    #unread-count {
+      background: #EF4444;
+      color: white;
+      border-radius: 9999px;
+      min-width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      font-size: 0.75rem;
+      margin-left: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    #notification-popup {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 280px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 50;
+      padding: 12px;
+      display: none;
+      margin-top: 8px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark #notification-popup {
+      background: #1F2937;
+    }
+    #notification-popup.show {
+      display: block;
+    }
+    #notification-popup .close-btn {
+      position: sticky;
+      top: 4px;
+      right: 8px;
+      font-size: 1rem;
+    }
+    #notification-list a {
+      color: #4B9EFF;
+      text-decoration: underline;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+      display: block;
+      padding: 4px 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    #notification-list a.read {
+      color: #6B7280;
+    }
+    .dark #notification-list a.read {
+      color: #9CA3AF;
+    }
+    #notification-list a:hover {
+      color: #2E4A7D;
+    }
+    .dark #notification-list a:hover {
+      color: #D1D5DB;
+    }
+    #notification-list li {
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .dark #notification-list li {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    #notification-list li:last-child {
+      border-bottom: none;
+    }
+    .read-mark {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 1rem;
+    }
+    .auth-error {
+      display: none;
+      background-color: #EF4444;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.9rem;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .auth-error.show {
+      display: block;
+    }
+    .delete-btn {
+      background: #EF4444;
+    }
+    @media (max-width: 640px) {
+      #user-name {
+        font-size: 0.875rem;
+        white-space: normal;
+      }
+      #notification-bell {
+        font-size: 1rem;
+      }
+      #unread-count {
+        min-width: 16px;
+        height: 16px;
+        line-height: 16px;
+        font-size: 0.625rem;
+      }
+      .navbar-container {
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 8px;
+      }
+      .navbar-link {
+        font-size: 1rem;
+        margin-left: 8px;
+        white-space: normal;
+      }
+      .comment-meta {
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .delete-comment-btn {
+        padding: 1px 4px;
+        font-size: 0.7rem;
+        height: 18px;
+      }
+    }
+    .navbar-link {
+      color: #2E4A7D;
+      font-size: 1.25rem;
+      font-weight: 600;
+      transition: color 0.3s ease;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .dark .navbar-link {
+      color: white;
+    }
+    .navbar-link:hover {
+      color: #4B9EFF;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <nav class="fixed top-0 left-0 w-full glass z-20">
+    <div class="navbar-container container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-3xl font-extrabold">Общественная организация</h1>
+      <div class="flex items-center">
+        <span id="user-name" class="text-lg font-semibold mr-4"></span>
+        <a href="#suggest" class="navbar-link">Предложить новость</a>
+        <div id="notification-bell" class="flex items-center ml-2">
+          <span class="text-xl">🔔</span>
+          <span id="unread-count" class="hidden"></span>
+          <div id="notification-popup">
+            <button id="close-notification" class="close-btn">✕</button>
+            <h3 class="text-sm font-semibold mb-2">Новые и непрочитанные статьи</h3>
+            <ul id="notification-list" class="space-y-1"></ul>
+          </div>
+        </div>
+        <button id="burger-toggle" class="text-3xl focus:outline-none ml-4">☰</button>
+      </div>
+    </div>
+  </nav>
+  <div id="burger-menu" class="fixed top-0 right-0 h-full w-80 glass shadow-lg z-30">
+    <div class="p-6">
+      <button id="close-menu" class="text-2xl mb-4">✕</button>
+      <ul class="space-y-6">
+        <li><a href="#news" class="text-lg hover:text-[#2E4A7D] dark:hover:text-[#4B9EFF] transition-colors">Новости</a></li>
+        <li><a href="#suggest" class="text-lg hover:text-[#2E4A7D] dark:hover:text-[#4B9EFF] transition-colors">Предложить новость</a></li>
+        <li><a href="faq.html" class="text-lg hover:text-[#2E4A7D] dark:hover:text-[#4B9EFF] transition-colors">FAQ</a></li>
+        <li><a href="#contacts" class="text-lg hover:text-[#2E4A7D] dark:hover:text-[#4B9EFF] transition-colors">Контакты</a></li>
+        <li><button id="auth-btn" class="text-lg hover:text-[#2E4A7D] dark:hover:text-[#4B9EFF] transition-colors">Войти/Зарегистрироваться</button></li>
+        <li><button id="logout-btn" class="text-lg hover:text-[#2E4A7D] dark:hover:text-[#4B9EFF] transition-colors hidden">Выйти</button></li>
+      </ul>
+      <div id="user-info" class="mt-4 text-lg hidden"></div>
+      <div id="contacts" class="mt-12">
+        <h3 class="text-xl font-semibold">Контакты</h3>
+        <p class="mt-2">Email: info@org.ru</p>
+        <p>Телефон: +7 (999) 123-45-67</p>
+        <p>Адрес: ул. Примерная, 123, Москва</p>
+      </div>
+    </div>
+  </div>
+  <div id="auth-modal">
+    <div class="modal-content glass">
+      <button id="auth-close" class="close-btn">✕</button>
+      <h2 id="auth-title" class="text-2xl font-semibold mb-4 text-[#2E4A7D] dark:text-white">Регистрация</h2>
+      <input id="auth-name" type="text" placeholder="Имя" class="w-full p-3 mb-4 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D]">
+      <input id="auth-login" type="text" placeholder="Логин" class="w-full p-3 mb-4 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D]">
+      <input id="auth-password" type="password" placeholder="Пароль" class="w-full p-3 mb-4 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D]">
+      <input id="auth-confirm-password" type="password" placeholder="Повторите пароль" class="w-full p-3 mb-4 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D]">
+      <button id="auth-submit" class="btn px-6 py-3 rounded-lg w-full mb-4">Зарегистрироваться</button>
+      <button id="auth-toggle" class="text-[#2E4A7D] dark:text-[#4B9EFF] hover:underline">Уже есть аккаунт? Войти</button>
+      <div id="auth-error" class="auth-error"></div>
+    </div>
+  </div>
+  <div class="container mx-auto px-4 py-20 relative z-10">
+    <button id="theme-toggle" class="fixed top-4 right-4 p-3 glass rounded-full text-[#2E4A7D] dark:text-white">
+      <span class="dark:hidden">🌙</span>
+      <span class="hidden dark:inline">☀️</span>
+    </button>
+    <section id="news" class="mb-16 parallax-section">
+      <h2 class="text-4xl font-extrabold mb-8">Новости</h2>
+      <div id="news-list" class="space-y-8"></div>
+    </section>
+    <section id="suggest" class="mb-16 parallax-section">
+      <h2 class="text-4xl font-extrabold mb-8">Предложить новость</h2>
+      <div class="glass p-8 rounded-2xl">
+        <input id="news-title" type="text" placeholder="Заголовок" class="w-full p-3 mb-4 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D]">
+        <div class="toolbar">
+          <button onclick="formatText('bold')">Жирный</button>
+          <button onclick="formatText('italic')">Курсив</button>
+          <select onchange="formatText('heading', this.value)">
+            <option value="">Заголовок</option>
+            <option value="h2">H2</option>
+            <option value="h3">H3</option>
+          </select>
+          <select id="font-size" onchange="formatText('font-size')">
+            <option value="">Размер шрифта</option>
+            <option value="12">12px</option>
+            <option value="14">14px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+            <option value="22">22px</option>
+            <option value="24">24px</option>
+            <option value="26">26px</option>
+            <option value="28">28px</option>
+            <option value="30">30px</option>
+          </select>
+        </div>
+        <textarea id="news-content" placeholder="Текст новости (используйте **жирный**, *курсив*, ## заголовок)" class="w-full p-3 mb-4 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D] h-40"></textarea>
+        <label class="file-input-label mb-4">Загрузить фото</label>
+        <input id="news-image" type="file" accept="image/jpeg,image/png" class="mb-4">
+        <img id="image-preview" class="preview-image hidden" alt="Предпросмотр изображения">
+        <div id="preview" class="glass p-4 rounded-lg mb-4"></div>
+        <button id="submit-news" class="btn px-6 py-3 rounded-lg">Отправить</button>
+      </div>
+    </section>
+  </div>
+  <div id="notification-container" class="notification-container"></div>
+  <script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
+        }
+      }
+      return gk_fileData[filename] || "";
+    }
+    marked.setOptions({ breaks: true, gfm: true });
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: '#2E4A7D' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.3, random: true },
+        size: { value: 2, random: true },
+        line_linked: { enable: false },
+        move: { enable: true, speed: 1, direction: 'none', random: true }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
+        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+      }
+    });
+    let news = JSON.parse(localStorage.getItem('news')) || [
+      {
+        id: 1,
+        title: 'Пример новости',
+        content: 'Это пример новости для демонстрации.\n\n**Жирный текст**\n*Курсив*\n## Заголовок H2',
+        date: '19.05.2025',
+        avatar: 'https://avatars.mds.yandex.net/i?id=ca3713f1ea6600d3913c01b6c2ec19ed62a47e47-5860005-images-thumbs&n=13',
+        image: null,
+        authorId: null,
+        likes: 0,
+        likedBy: [],
+        comments: []
+      }
+    ];
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    news = news.map(item => ({
+      ...item,
+      comments: item.comments.map((comment, index) => {
+        if (typeof comment === 'string') {
+          return {
+            id: index + 1,
+            text: comment,
+            authorId: null,
+            timestamp: new Date().toISOString()
+          };
+        }
+        return comment;
+      })
+    }));
+    if (currentUser && !currentUser.readArticles) {
+      currentUser.readArticles = [];
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+    users = users.map(user => ({
+      ...user,
+      readArticles: user.readArticles || []
+    }));
+    localStorage.setItem('news', JSON.stringify(news));
+    localStorage.setItem('users', JSON.stringify(users));
+    function isNewArticle(dateStr) {
+      const [day, month, year] = dateStr.split('.').map(Number);
+      const articleDate = new Date(year, month - 1, day);
+      const now = new Date();
+      const seventyTwoHours = new Date(now.getTime() - 72 * 60 * 60 * 1000);
+      return articleDate >= seventyTwoHours;
+    }
+    function markArticleAsRead(articleId) {
+      if (currentUser && !currentUser.readArticles.includes(articleId)) {
+        currentUser.readArticles.push(articleId);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        users = users.map(u => u.id === currentUser.id ? currentUser : u);
+        localStorage.setItem('users', JSON.stringify(users));
+        updateNotificationCount();
+        renderNotificationPopup();
+        renderNews();
+      }
+    }
+    function updateNotificationCount() {
+      const countElement = document.getElementById('unread-count');
+      const readArticles = currentUser ? currentUser.readArticles || [] : [];
+      const newAndUnreadArticles = news.filter(article => {
+        const isNew = isNewArticle(article.date);
+        const isUnread = currentUser ? !readArticles.includes(article.id) : false;
+        return isNew || isUnread;
+      });
+      const unreadCount = newAndUnreadArticles.length;
+      countElement.textContent = unreadCount;
+      countElement.classList.toggle('hidden', unreadCount === 0);
+    }
+    function renderNotificationPopup() {
+      const notificationList = document.querySelector('#notification-list');
+      notificationList.innerHTML = '';
+      const readArticles = currentUser ? currentUser.readArticles || [] : [];
+      const newAndUnreadArticles = news.filter(article => {
+        const isNew = isNewArticle(article.date);
+        const isUnread = currentUser ? !readArticles.includes(article.id) : false;
+        return isNew || isUnread;
+      });
+      if (newAndUnreadArticles.length === 0) {
+        notificationList.innerHTML = '<li class="text-gray-500 text-sm">Нет новых или непрочитанных статей</li>';
+      } else {
+        newAndUnreadArticles.forEach(article => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#news-${article.id}`;
+          a.textContent = article.title;
+          if (readArticles.includes(article.id)) {
+            a.classList.add('read');
+          }
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newsElement = document.querySelector(`[data-news-id="${article.id}"]`);
+            if (newsElement) {
+              newsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              markArticleAsRead(article.id);
+              a.classList.add('read');
+              closeNotificationModal();
+            }
+          });
+          li.appendChild(a);
+          notificationList.appendChild(li);
+        });
+      }
+    }
+    function openNotificationPopup() {
+      const popup = document.getElementById('notification-popup');
+      popup.classList.add('show');
+      renderNotificationPopup();
+      gsap.fromTo(popup, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
+    }
+    function closeNotificationModal() {
+      const popup = document.getElementById('notification-popup');
+      gsap.to(popup, {
+        opacity: 0,
+        y: -10,
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => popup.classList.remove('show')
+      });
+    }
+    document.getElementById('notification-bell').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const popup = document.getElementById('notification-popup');
+      if (popup.classList.contains('show')) {
+        closeNotificationModal();
+      } else {
+        openNotificationPopup();
+      }
+    });
+    document.getElementById('close-notification').addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeNotificationModal();
+    });
+    document.addEventListener('click', (e) => {
+      const popup = document.getElementById('notification-popup');
+      if (popup.classList.contains('show') && !popup.contains(e.target) && e.target !== document.getElementById('notification-bell')) {
+        closeNotificationModal();
+      }
+    });
+    function debounce(func, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+    function formatText(type, value) {
+      const textarea = document.getElementById('news-content');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = textarea.value.substring(start, end) || 'Текст';
+      let formattedText = selectedText;
+      if (type === 'bold') {
+        formattedText = `**${selectedText}**`;
+      } else if (type === 'italic') {
+        formattedText = `*${selectedText}*`;
+      } else if (type === 'heading') {
+        formattedText = value ? `\n${value === 'h2' ? '##' : '###'} ${selectedText}\n` : selectedText;
+      } else if (type === 'font-size') {
+        const size = document.getElementById('font-size').value;
+        if (size) {
+          formattedText = `<span style="font-size: ${size}px">${selectedText}</span>`;
+        } else {
+          return;
+        }
+      }
+      textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+      textarea.focus();
+      updatePreview();
+    }
+    function updatePreview() {
+      const textarea = document.getElementById('news-content');
+      const preview = document.getElementById('preview');
+      const rawText = textarea.value || 'Начните вводить текст...';
+      const parsedText = marked.parse(rawText);
+      preview.innerHTML = DOMPurify.sanitize(parsedText, {
+        ALLOWED_TAGS: ['p', 'strong', 'em', 'h2', 'h3', 'span'],
+        ALLOWED_ATTR: ['style']
+      });
+      const imagePreview = document.getElementById('image-preview');
+      if (imagePreview.src && !imagePreview.classList.contains('hidden')) {
+        preview.appendChild(imagePreview);
+      }
+    }
+    let currentImage = null;
+    document.getElementById('news-image').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const validTypes = ['image/jpeg', 'image/png'];
+      if (!validTypes.includes(file.type)) {
+        showNotification('Поддерживаются только JPG и PNG');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('Файл не должен превышать 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        currentImage = reader.result;
+        const imagePreview = document.getElementById('image-preview');
+        imagePreview.src = currentImage;
+        imagePreview.classList.remove('hidden');
+        updatePreview();
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('news-content').addEventListener('input', updatePreview);
+    updatePreview();
+    function showNotification(message, isRepost = false, isLike = false) {
+      const container = document.getElementById('notification-container');
+      let existingNotifications = container.querySelectorAll('.notification, .like-widget');
+      if (existingNotifications.length >= 5) {
+        const oldest = existingNotifications[0];
+        gsap.to(oldest, {
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.in',
+          onComplete: () => oldest.remove()
+        });
+      }
+      const notification = document.createElement('div');
+      const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      notification.id = id;
+      notification.className = isLike ? 'like-widget' : 'notification';
+      notification.textContent = message;
+      existingNotifications = container.querySelectorAll('.notification, .like-widget');
+      existingNotifications.forEach((notif, i) => {
+        notif.style.bottom = `${20 + i * 60}px`;
+        notif.style.zIndex = 40 + i;
+      });
+      const index = existingNotifications.length;
+      notification.style.bottom = `${20 + index * 60}px`;
+      notification.style.zIndex = 40 + index;
+      container.appendChild(notification);
+      notification.classList.add('show');
+      gsap.fromTo(notification, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' });
+      const timeout = isRepost ? 15000 : isLike ? 2000 : 3000;
+      setTimeout(() => {
+        gsap.to(notification, {
+          opacity: 0,
+          duration: 1,
+          ease: 'power2.in',
+          onComplete: () => {
+            notification.remove();
+            const remainingNotifications = container.querySelectorAll('.notification, .like-widget');
+            remainingNotifications.forEach((notif, i) => {
+              notif.style.bottom = `${20 + i * 60}px`;
+              notif.style.zIndex = 40 + i;
+            });
+          }
+        });
+      }, timeout);
+    }
+    const debouncedShowNotification = debounce(showNotification, 300);
+    function updateUserInfo() {
+      const userInfo = document.getElementById('user-info');
+      const userName = document.getElementById('user-name');
+      const authBtn = document.getElementById('auth-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+      if (currentUser) {
+        userInfo.textContent = `Вы авторизованы как редактор, ${currentUser.name || currentUser.username}!`;
+        userName.textContent = currentUser.name || currentUser.username;
+        userInfo.classList.remove('hidden');
+        authBtn.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+      } else {
+        userInfo.classList.add('hidden');
+        userName.textContent = 'Гость';
+        authBtn.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
+      }
+      updateNotificationCount();
+      renderNotificationPopup();
+    }
+    const authModal = document.getElementById('auth-modal');
+    const authTitle = document.getElementById('auth-title');
+    const authSubmit = document.getElementById('auth-submit');
+    const authToggle = document.getElementById('auth-toggle');
+    const authClose = document.getElementById('auth-close');
+    const authError = document.getElementById('auth-error');
+    let isRegister = true;
+    document.getElementById('auth-btn').addEventListener('click', () => {
+      authModal.classList.add('show');
+      isRegister = true;
+      authTitle.textContent = 'Регистрация';
+      authSubmit.textContent = 'Зарегистрироваться';
+      authToggle.textContent = 'Уже есть аккаунт? Войти';
+      document.getElementById('auth-name').value = '';
+      document.getElementById('auth-login').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-confirm-password').value = '';
+      authError.classList.remove('show');
+    });
+    authClose.addEventListener('click', () => {
+      authModal.classList.remove('show');
+      authError.classList.remove('show');
+    });
+    authModal.addEventListener('click', (e) => {
+      if (e.target === authModal) {
+        authModal.classList.remove('show');
+        authError.classList.remove('show');
+      }
+    });
+    authToggle.addEventListener('click', () => {
+      isRegister = !isRegister;
+      authTitle.textContent = isRegister ? 'Регистрация' : 'Вход';
+      authSubmit.textContent = isRegister ? 'Зарегистрироваться' : 'Войти';
+      authToggle.textContent = isRegister ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
+      if (isRegister) {
+        document.getElementById('auth-name').style.display = 'block';
+        document.getElementById('auth-confirm-password').style.display = 'block';
+      } else {
+        document.getElementById('auth-name').style.display = 'none';
+        document.getElementById('auth-confirm-password').style.display = 'none';
+      }
+      authError.classList.remove('show');
+    });
+    authSubmit.addEventListener('click', () => {
+      const name = document.getElementById('auth-name').value.trim();
+      const login = document.getElementById('auth-login').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      const confirmPassword = document.getElementById('auth-confirm-password').value.trim();
+      authError.classList.remove('show');
+      if (isRegister) {
+        if (!name || !login || !password || !confirmPassword) {
+          authError.textContent = 'Заполните все поля';
+          authError.classList.add('show');
+          return;
+        }
+        if (users.find(u => u.login === login)) {
+          authError.textContent = 'Логин уже занят';
+          authError.classList.add('show');
+          return;
+        }
+        if (password.length < 8) {
+          authError.textContent = 'Пароль должен содержать минимум 8 символов';
+          authError.classList.add('show');
+          return;
+        }
+        const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+        if (!specialCharRegex.test(password)) {
+          authError.textContent = 'Пароль должен содержать хотя бы один специальный символ';
+          authError.classList.add('show');
+          return;
+        }
+        if (password !== confirmPassword) {
+          authError.textContent = 'Пароли не совпадают';
+          authError.classList.add('show');
+          return;
+        }
+        const user = {
+          id: users.length + 1,
+          name,
+          login,
+          password: btoa(password),
+          username: login,
+          readArticles: []
+        };
+        users.push(user);
+        localStorage.setItem('users', JSON.stringify(users));
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        debouncedShowNotification('Регистрация успешна');
+        authModal.classList.remove('show');
+        updateUserInfo();
+      } else {
+        if (!login || !password) {
+          authError.textContent = 'Заполните все поля';
+          authError.classList.add('show');
+          return;
+        }
+        const user = users.find(u => u.login === login && u.password === btoa(password));
+        if (!user) {
+          authError.textContent = 'Неверный логин или пароль';
+          authError.classList.add('show');
+          return;
+        }
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        debouncedShowNotification('Вход успешен');
+        authModal.classList.remove('show');
+        updateUserInfo();
+      }
+    });
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      updateUserInfo();
+      debouncedShowNotification('Вы вышли');
+    });
+    function formatTimestamp(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    function renderNews() {
+      const newsList = document.getElementById('news-list');
+      newsList.innerHTML = '';
+      const readArticles = currentUser ? currentUser.readArticles || [] : [];
+      news.forEach(item => {
+        const newsItem = document.createElement('div');
+        newsItem.className = 'glass p-6 rounded-2xl';
+        newsItem.setAttribute('data-news-id', item.id);
+        newsItem.id = `news-${item.id}`;
+        const likedByNames = item.likedBy
+          .map(userId => users.find(u => u.id === userId)?.username)
+          .filter(Boolean)
+          .join(', ') || '0';
+        const authorName = item.authorId
+          ? users.find(u => u.id === item.authorId)?.username || 'Аноним'
+          : 'Аноним';
+        const isRead = readArticles.includes(item.id);
+        newsItem.innerHTML = `
+          <div class="flex items-start">
+            <img src="${item.avatar}" class="news-avatar" alt="Аватар новости">
+            <div>
+              <h3 class="text-2xl font-semibold mb-2">${item.title}<span class="read-mark">${isRead ? '✅' : ''}</span></h3>
+              <p class="text-sm text-gray-400 mb-2">${item.date}, ${authorName}</p>
+            </div>
+          </div>
+          <div class="news-content mb-4">${marked.parse(item.content)}</div>
+          ${item.image ? `<img src="${item.image}" class="news-image" alt="Изображение новости">` : ''}
+          <div class="flex space-x-4 mb-6 mt-4">
+            <button class="btn like-btn px-4 py-2 rounded-lg" data-id="${item.id}">
+              👍 ${item.likes}
+            </button>
+            <button class="btn repost-btn px-4 py-2 rounded-lg" data-id="${item.id}">
+              🔄 Репост
+            </button>
+            <button class="btn edit-btn px-4 py-2 rounded-lg" data-id="${item.id}">
+              ✏️ Редактировать
+            </button>
+            ${currentUser ? `<button class="btn delete-btn px-4 py-2 rounded-lg" data-id="${item.id}">
+              🗑️ Удалить статью
+            </button>` : ''}
+          </div>
+          <div class="likes-list">Понравилось: ${likedByNames}</div>
+          <div class="comments">
+            <h4 class="font-semibold mb-3">Комментарии</h4>
+            <div class="space-y-3 mb-4">
+              ${item.comments.map(c => `
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="comment-meta">
+                      ${c.authorId ? users.find(u => u.id === c.authorId)?.username || 'Аноним' : 'Аноним'}, ${formatTimestamp(c.timestamp)}
+                      ${currentUser ? `<button class="delete-comment-btn" data-news-id="${item.id}" data-comment-id="${c.id}">🗑️</button>` : ''}
+                    </p>
+                    <p class="glass p-3 rounded-lg">${c.text}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <input type="text" placeholder="Ваш комментарий" class="w-full p-3 mb-3 bg-transparent border rounded-lg focus:outline-none focus:border-[#2E4A7D] comment-input" data-id="${item.id}">
+            <button class="btn comment-btn px-4 py-2 rounded-lg" data-id="${item.id}">
+              Отправить
+            </button>
+          </div>
+        `;
+        newsList.appendChild(newsItem);
+        gsap.from(newsItem, { opacity: 0, y: 50, duration: 0.8, ease: 'power3.out' });
+      });
+      if (currentUser) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const articleId = parseInt(entry.target.getAttribute('data-news-id'));
+              markArticleAsRead(articleId);
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('[data-news-id]').forEach(item => observer.observe(item));
+      }
+      updateNotificationCount();
+      renderNotificationPopup();
+    }
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('like-btn')) {
+        if (!currentUser) {
+          debouncedShowNotification('Войдите, чтобы лайкнуть');
+          return;
+        }
+        const id = parseInt(e.target.dataset.id);
+        const newsItem = news.find(n => n.id === id);
+        if (!newsItem.likedBy.includes(currentUser.id)) {
+          newsItem.likes++;
+          newsItem.likedBy.push(currentUser.id);
+          localStorage.setItem('news', JSON.stringify(news));
+          renderNews();
+          debouncedShowNotification(`Лайк #${newsItem.likes} на "${newsItem.title}"`, false, true);
+        }
+      }
+    });
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('edit-btn')) {
+        const id = parseInt(e.target.dataset.id);
+        const newsItem = news.find(n => n.id === id);
+        document.getElementById('news-title').value = newsItem.title;
+        document.getElementById('news-content').value = newsItem.content;
+        const imagePreview = document.getElementById('image-preview');
+        if (newsItem.image) {
+          currentImage = newsItem.image;
+          imagePreview.src = currentImage;
+          imagePreview.classList.remove('hidden');
+        } else {
+          currentImage = null;
+          imagePreview.classList.add('hidden');
+        }
+        updatePreview();
+        const submitBtn = document.getElementById('submit-news');
+        submitBtn.textContent = 'Сохранить изменения';
+        submitBtn.setAttribute('data-edit-id', id);
+        window.scrollTo({ top: document.getElementById('suggest').offsetTop, behavior: 'smooth' });
+      }
+    });
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('repost-btn')) {
+        const id = parseInt(e.target.dataset.id);
+        const newsItem = news.find(n => n.id === id);
+        navigator.clipboard.writeText(`Новость: ${newsItem.title}\n${newsItem.content}`);
+        debouncedShowNotification('Ссылка на новость скопирована!', true);
+      }
+    });
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('comment-btn')) {
+        const id = parseInt(e.target.dataset.id);
+        const input = document.querySelector(`.comment-input[data-id="${id}"]`);
+        if (input.value.trim()) {
+          const newsItem = news.find(n => n.id === id);
+          const comment = {
+            id: (newsItem.comments.length || 0) + 1,
+            text: input.value.trim(),
+            authorId: currentUser ? currentUser.id : null,
+            timestamp: new Date().toISOString()
+          };
+          newsItem.comments.push(comment);
+          localStorage.setItem('news', JSON.stringify(news));
+          renderNews();
+          input.value = '';
+          debouncedShowNotification('Комментарий добавлен!');
+        }
+      }
+    });
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('delete-comment-btn')) {
+        const newsId = parseInt(e.target.dataset.newsId);
+        const commentId = parseInt(e.target.dataset.commentId);
+        const newsItem = news.find(n => n.id === newsId);
+        newsItem.comments = newsItem.comments.filter(c => c.id !== commentId);
+        localStorage.setItem('news', JSON.stringify(news));
+        renderNews();
+        debouncedShowNotification('Комментарий удалён!');
+      }
+    });
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('delete-btn')) {
+        const id = parseInt(e.target.dataset.id);
+        news = news.filter(n => n.id !== id);
+        localStorage.setItem('news', JSON.stringify(news));
+        renderNews();
+        debouncedShowNotification('Статья удалена!');
+      }
+    });
+    document.getElementById('submit-news').addEventListener('click', () => {
+      const title = document.getElementById('news-title').value.trim();
+      const content = document.getElementById('news-content').value.trim();
+      const submitBtn = document.getElementById('submit-news');
+      const editId = submitBtn.getAttribute('data-edit-id');
+      if (title && content) {
+        const date = new Date().toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        if (editId) {
+          const id = parseInt(editId);
+          const newsItem = news.find(n => n.id === id);
+          newsItem.title = title;
+          newsItem.content = content;
+          newsItem.date = date;
+          newsItem.image = currentImage;
+          newsItem.authorId = currentUser ? currentUser.id : null;
+          localStorage.setItem('news', JSON.stringify(news));
+          renderNews();
+          submitBtn.textContent = 'Отправить';
+          submitBtn.removeAttribute('data-edit-id');
+          debouncedShowNotification('Новость отредактирована!');
+        } else {
+          news.push({
+            id: news.length + 1,
+            title,
+            content,
+            date,
+            avatar: 'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&h=64&w=64',
+            image: currentImage,
+            authorId: currentUser ? currentUser.id : null,
+            likes: 0,
+            likedBy: [],
+            comments: []
+          });
+          localStorage.setItem('news', JSON.stringify(news));
+          renderNews();
+          debouncedShowNotification('Новость предложена!');
+        }
+        document.getElementById('news-title').value = '';
+        document.getElementById('news-content').value = '';
+        document.getElementById('image-preview').classList.add('hidden');
+        currentImage = null;
+        document.getElementById('news-image').value = '';
+        document.getElementById('preview').innerHTML = '';
+      } else {
+        debouncedShowNotification('Заполните заголовок и текст новости');
+      }
+    });
+    const burgerToggle = document.getElementById('burger-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const burgerMenu = document.getElementById('burger-menu');
+    burgerToggle.addEventListener('click', () => {
+      burgerMenu.classList.add('open');
+      gsap.fromTo(burgerMenu, { x: '100%' }, { x: 0, duration: 0.5, ease: 'power3.out' });
+    });
+    closeMenu.addEventListener('click', () => {
+      gsap.to(burgerMenu, {
+        x: '100%',
+        duration: 0.5,
+        ease: 'power3.in',
+        onComplete: () => burgerMenu.classList.remove('open')
+      });
+    });
+    const toggleTheme = () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    };
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    window.addEventListener('scroll', () => {
+      document.querySelectorAll('.parallax-section').forEach(section => {
+        const offset = window.pageYOffset;
+        section.style.transform = `translateY(${offset * 0.2}px)`;
+      });
+    });
+    updateUserInfo();
+    renderNews();
+    updatePreview();
+  </script>
+</body>
+</html>
+
